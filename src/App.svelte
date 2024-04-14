@@ -5,6 +5,10 @@
 	import { Router, Link, Route } from "svelte-routing";
 
 	export let url = "";
+	if (window.location.pathname == "/") {
+		window.location.href = "/login";
+	}
+
 
 </script>
 
@@ -25,7 +29,6 @@
 <style>
 	main {
 		text-align: center;
-		padding: 0.5em;
 		max-width: 240px;
 		margin: 0 auto;
 	}

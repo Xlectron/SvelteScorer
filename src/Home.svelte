@@ -2,6 +2,10 @@
     // Import the necessary modules
     import { onMount } from 'svelte';
     import csimg from './assets/cslogo.png';
+    import ppimg from './assets/pplogo.png'
+    import trophyimg from './assets/trophy.png'
+    import lockimg from './assets/lock.png'
+    import teamsimg from './assets/teamslogo.png'
   
     // Function to handle navigation to different pages
     function navigateTo(location) {
@@ -45,14 +49,29 @@
       padding: 20px;
       margin: 10px;
       font-size: 24px;
-      background-color: #007bff;
-      color: #fff;
+      background-color: white;
+      color: black;
       border: none;
       cursor: pointer;
+      margin: 20px; 
     }
+
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px; /* Add some space between the button rows */
+    }
+
+    .button-row {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 10px; /* Add some space between the buttons */
+    }
+
   
     /* Style for sign out and account buttons */
-    .bottom-buttons {
+    .bottom-button {
       position: fixed;
       bottom: 20px;
       left: 20px;
@@ -62,28 +81,40 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      padding: 10px;
-      font-size: 18px;
-      background-color: #28a745;
-      color: #fff;
-      border: none;
-      cursor: pointer;
     }
   </style>
   
-  <div>
-    <!-- Five big buttons for different pages -->
-    <button class="button" on:click={() => navigateTo("PS")}>PowerPlay Scorer</button>
-    <button class="button" on:click={() => navigateTo("CS")}> <img src={csimg} alt="" width="250"> Scorer</button>
-    <button class="button" on:click={() => navigateTo("NS")}>Scorer</button>
-    <button class="button" on:click={() => navigateTo("L")}>Leaderboard</button>
-    <button class="button" on:click={() => navigateTo("MT")}>My Teams</button>
+  <div class="button-container">
+    <div class="button-row">
+      <button class="button" on:click={() => navigateTo("PS")}>
+        <img src={ppimg} alt="" width="250"> <br> Scorer
+      </button>
+      <button class="button" on:click={() => navigateTo("CS")}>
+        <img src={csimg} alt="" width="250"> <br> Scorer
+      </button>
+      <button class="button" on:click={() => navigateTo("NS")}>
+        <img src={lockimg} alt="" width="100"> <br> Scorer
+      </button>
+    </div>
+    <div class="button-row">
+      <button class="button" on:click={() => navigateTo("L")}>
+        <img src={trophyimg} alt="" width="100"> <br> Leaderboard
+      </button>
+      <button class="button" on:click={() => navigateTo("MT")}>
+        <img src={teamsimg} alt="" width="100"> <br> My Teams
+      </button>
+    </div>
   </div>
+  
   
   <!-- Sign out and account buttons -->
-  <div class="bottom-buttons">
+  <div class="bottom-button">
     <button class="button" on:click={signOut}>Sign Out</button>
   </div>
+
+  <div class="account-button">
+    <button class="button" on:click={goToAccount}>Account</button>
+  </div>
   
-  <button class="account-button" on:click={goToAccount}>Account</button>
+  
   
