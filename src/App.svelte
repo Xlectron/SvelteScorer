@@ -22,8 +22,6 @@
 			<Route path="/csscorer" component={Scorer} />
 		</div>
 	</Router>
-
-
 </main>
 
 <style>
