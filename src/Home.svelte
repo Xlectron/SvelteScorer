@@ -17,9 +17,9 @@
         case "NS":
             return
         case "L":
-            return
+            window.location.href = "/leaderboard"
         case "MT":
-            return
+            window.location.href = "/myteams"
       }
     }
   
@@ -42,18 +42,22 @@
     });
   </script>
   
-  <style>
+  <style> 
      /* Style for buttons */
     .button {
       display: inline-block;
       padding: 20px;
-      margin: 10px;
       font-size: 24px;
       background-color: white;
       color: black;
       border: none;
       cursor: pointer;
       margin: 20px; 
+      transition: border-color 0.2s ease;
+    }
+
+    button:hover {
+        background-color: #E5B8F4;
     }
 
     .button-container {
@@ -83,25 +87,27 @@
       right: 20px;
     }
   </style>
+
+<h1>FTC Scorer</h1>
   
   <div class="button-container">
     <div class="button-row">
       <button class="button" on:click={() => navigateTo("PS")}>
-        <img src={ppimg} alt="" width="250"> <br> Scorer
+        <img src={ppimg} alt="" width="150"> <br> Scorer
       </button>
       <button class="button" on:click={() => navigateTo("CS")}>
-        <img src={csimg} alt="" width="250"> <br> Scorer
+        <img src={csimg} alt="" width="150"> <br> Scorer
       </button>
       <button class="button" on:click={() => navigateTo("NS")}>
-        <img src={lockimg} alt="" width="100"> <br> Scorer
+        <img src={lockimg} alt="" width="150"> <br> Scorer
       </button>
     </div>
     <div class="button-row">
       <button class="button" on:click={() => navigateTo("L")}>
-        <img src={trophyimg} alt="" width="100"> <br> Leaderboard
+        <img src={trophyimg} alt="" width="150"> <br> Leaderboard
       </button>
       <button class="button" on:click={() => navigateTo("MT")}>
-        <img src={teamsimg} alt="" width="100"> <br> My Teams
+        <img src={teamsimg} alt="" width="150"> <br> My Teams
       </button>
     </div>
   </div>

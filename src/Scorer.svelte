@@ -83,8 +83,8 @@
       padding: 20px;
       margin: 10px;
       font-size: 24px;
-      background-color: #007bff;
-      color: #fff;
+      background-color: white;
+      color: black;
       border: none;
       cursor: pointer;
     }

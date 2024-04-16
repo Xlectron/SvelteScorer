@@ -18,6 +18,8 @@
 
 
 <main>
+    <h1>FTC Scorer</h1>
+
     {#if loginType == "login"}
     <div class="login-container">
         <h2> Log In </h2>
@@ -63,7 +65,7 @@
 
     input {
         border: none;
-        color: black;
+        color: #3b3a30;
         border-bottom: 1px solid #dbdbdb;
         margin-bottom: 20px;
         padding: 10px 12px;
@@ -76,12 +78,12 @@
 
     input:focus {
         outline: none;
-        border-color: #3897f0;
+        border-color: #9b3eba;
     }
 
     button {
         margin-top: 20px;
-        background-color: #3897f0;
+        background-color: #9b3eba;
         color: #fff;
         padding: 10px 0;
         width: 100%;
