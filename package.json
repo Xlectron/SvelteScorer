@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@vercel/analytics": "^1.0.2",
-    "crypto": "^1.0.1"
+    "crypto": "^1.0.1",
+    "express": "^4.19.2",
+    "mysql": "^2.18.1"
   }
 }

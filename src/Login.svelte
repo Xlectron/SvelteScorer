@@ -3,17 +3,41 @@
     let password = '';
     export let loginType = "login";
 
-	const login = () => {
-		console.log("Email: " + email);
-		console.log("Password: " + email);
-        window.location.href = "/home";
-	}
+    const hashPassword = async () => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const buffer = await crypto.subtle.digest('SHA-256', data);
+        return new Uint8Array(buffer);
+    };
 
-    const signUp = () => {
-        loginType = "signup"
-        
-    }
-    console.log(loginType)
+    const login = async () => {
+        const hashedPassword = await hashPassword();
+        console.log(hashedPassword)
+
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, hashedPassword })
+            });
+            const data = await response.json();
+            console.log(data); // Log the response from the server
+            if (data.message === 'Login successful') {
+                window.location.href = "/home"; // Redirect to home page
+            } else {
+                console.log('Login unsuccessful');
+                // Handle unsuccessful login here
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const signUp = async () => {
+        // Handle sign up logic
+    };
 </script>
 
 
@@ -41,15 +65,13 @@
         <input bind:value={password} placeholder="Enter your password" type="password"/>
         <input bind:value={password} placeholder="Confirm password" type="password"/>
 
-        <button on:click={login}> Sign up </button>
+        <button on:click={signUp}> Sign up </button>
     </div>
     {/if}
 </main>
 
-
 <style>
-
-	h2 {
+    	h2 {
 		color: black;
 		font-size: 2em;
 	}
