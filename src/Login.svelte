@@ -1,6 +1,6 @@
 <script>
-    let email = '';
-    let password = '';
+    let email = 'bigboy@gmail.com';
+    let password = 'test';
     export let loginType = "login";
 
     const hashPassword = async () => {
@@ -11,29 +11,33 @@
     };
 
     const login = async () => {
-        const hashedPassword = await hashPassword();
-        console.log(hashedPassword)
+    try {
+        const hashedPassword = await hashPassword(); // Assuming hashPassword is a function that returns the hashed password as a Buffer
+        console.log(hashedPassword);
 
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ email, hashedPassword })
-            });
-            const data = await response.json();
-            console.log(data); // Log the response from the server
-            if (data.message === 'Login successful') {
-                window.location.href = "/home"; // Redirect to home page
-            } else {
-                console.log('Login unsuccessful');
-                // Handle unsuccessful login here
-            }
-        } catch (error) {
-            console.error('Error:', error);
+        const response = await fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, hashedPassword: Array.from(hashedPassword) }) // Convert Buffer to array before sending
+        });
+
+        const data = await response.json();
+        console.log(data); // Log the response from the server
+
+        if (data.message === 'Login successful') {
+            window.location.href = "/home"; // Redirect to home page
+        } else {
+            console.log('Login unsuccessful');
+            // Handle unsuccessful login here
         }
-    };
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+
 
     const signUp = async () => {
         // Handle sign up logic

@@ -34,7 +34,7 @@ function createAccount(id, email, name, password) {
 
   const hashedPassword = hash.update(password, 'utf-8').digest('hex');
 
-  const values = [id, email, hashedPassword, name];
+  const values = [id, email, hashedPassword.toString(), name]; // Convert hashedPassword to string
 
   connection.query(sql, values, (error, results, fields) => {
     if (error) {
@@ -44,6 +44,7 @@ function createAccount(id, email, name, password) {
     console.log('Account created successfully:', results);
   });
 }
+
 
 function retrieveUser(email, callback) {
   const sql = 'SELECT * FROM users WHERE email = ?';
@@ -60,9 +61,11 @@ function retrieveUser(email, callback) {
     }
     // Assuming there's only one user for a given email
     const user = results[0];
+    user.hashedPassword = user.hashedPassword.toString(); // Convert hashedPassword to string
     callback(null, user);
   });
 }
+
 
 
 // Middleware to log incoming requests
@@ -90,34 +93,39 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
   // Log the email and password sent in the request body
   const { email, hashedPassword } = req.body;
-  console.log('Login attempt with email:', email, 'and hashed password:', hashedPassword);
-
   // Accesses my custom module (app.js) which queries the mysql database
   retrieveUser(email, (error, user) => {
     if (error) {
       console.error('Error retrieving user:', error.message);
-      return res.status(500).json({ message: 'Internal Server Error' });
+      return res.status(500).json({ message: 'Internal server error' });
     }
     if (!user) {
       console.log('User not found');
-      return res.status(401).json({ message: 'Incorrect email or password' });
+      return res.status(401).json({ message: 'User not found' });
     }
 
-    // Check if the hashed password matches the stored hashed password
-    const storedHashedPassword = user.hashedPassword;
-    const isPasswordMatch = storedHashedPassword.equals(Buffer.from(hashedPassword, 'hex'));
+    // Compare the received hashed password with the stored hashed password
+    const storedHashedPassword = Buffer.from(user.hashedPassword, 'utf-8');
+    const receivedHashedPassword = Buffer.from(hashedPassword, 'hex');
 
-    if (isPasswordMatch) {
-      console.log('Login successful');
+    console.log("Stored:", storedHashedPassword)
+    console.log("Recieved:", receivedHashedPassword)
+
+    if (storedHashedPassword.equals(receivedHashedPassword)) {
+      console.log("CORRECT");
       // Send a success response
       return res.json({ message: 'Login successful' });
     } else {
-      console.log('Incorrect password');
+      console.log("INCORRECT");
       // Send an error response
       return res.status(401).json({ message: 'Incorrect email or password' });
     }
   });
 });
+
+
+
+
 
 
 
