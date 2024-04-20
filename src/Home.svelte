@@ -6,6 +6,20 @@
     import trophyimg from './assets/trophy.png'
     import lockimg from './assets/lock.png'
     import teamsimg from './assets/teamslogo.png'
+
+    let email;
+    let password;
+
+    const getCookie = (name) => {
+        const cookieString = document.cookie;
+        const cookies = cookieString.split('; ').reduce((acc, cookie) => {
+            const [cookieName, cookieValue] = cookie.split('=');
+            acc[cookieName] = cookieValue;
+            return acc;
+        }, {});
+        return cookies[name];
+    };
+
   
     // Function to handle navigation to different pages
     function navigateTo(location) {
@@ -19,7 +33,8 @@
         case "L":
             window.location.href = "/leaderboard"
         case "MT":
-            window.location.href = "/myteams"
+            window.location.href = "/myteams";
+            
       }
     }
   

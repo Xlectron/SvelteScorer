@@ -1,6 +1,5 @@
 const crypto = require('crypto');
 const mysql = require('mysql');
-const hash = crypto.createHash('sha256');
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -26,17 +25,13 @@ connection.connect((err) => {
 });
 
 
-function createAccount(id, email, name, password) {
-  // Create a new hash object for each account
-  const hash = crypto.createHash('sha256');
-  console.log("Creating Account with: ", id, email, name, password)
-  
-  // Using placeholders to avoid SQL injection
-  const sql = `INSERT INTO users (id, email, hashedPassword, name) VALUES (?, ?, ?, ?)`;
-  // utf-8 to hex, and update users
-  const hashedPassword = hash.update(password, 'hex').digest('hex');
+function createAccount(email, name, password) {
+  console.log("Creating Account with: ", email, name, password)
 
-  const values = [id, email, hashedPassword.toString(), name]; // Convert hashedPassword to string
+  // Using placeholders to avoid SQL injection
+  const sql = `INSERT INTO users (email, hashedPassword, name) VALUES (?, ?, ?)`;
+
+  const values = [email, password, name];
 
   connection.query(sql, values, (error, results, fields) => {
     if (error) {
@@ -63,8 +58,26 @@ function retrieveUser(email, callback) {
     }
     // Assuming there's only one user for a given email
     const user = results[0];
-    user.hashedPassword = user.hashedPassword.toString(); // Convert hashedPassword to string
     callback(null, user);
+  });
+}
+
+
+function retrieveTeams(email, callback) {
+  const sql = 'SELECT * FROM teams WHERE email = ?';
+  connection.query(sql, [email], (error, results, fields) => {
+    if (error) {
+      console.error('Error retrieving teams:', error.message);
+      callback(error, null);
+      return;
+    }
+    if (results.length === 0) {
+      console.log('Teams not found');
+      callback(null, null);
+      return;
+    }
+    const teams = results; // Array of different teams
+    callback(null, teams);
   });
 }
 
@@ -105,19 +118,10 @@ app.post('/login', (req, res) => {
       return res.status(401).json({ message: 'User not found' });
     }
 
-    const hash = crypto.createHash('sha256');
+    const storedHashedPassword = user.hashedPassword;
+    var receivedHashedPassword = hashedPassword;
 
-    // Compare the received hashed password with the stored hashed password
-    const storedHashedPassword = Buffer.from(user.hashedPassword, 'hex'); // This is hashed twice
-
-    var receivedHashedPassword = Buffer.from(hashedPassword, 'hex'); // This needs to be hashed a second time
-    receivedHashedPassword = Buffer.from(hash.update(receivedHashedPassword, 'hex').digest('hex'), 'hex');
-
-
-    console.log("Stored:", storedHashedPassword)
-    console.log("Recieved:", receivedHashedPassword)
-
-    if (storedHashedPassword.equals(receivedHashedPassword)) {
+    if (storedHashedPassword == receivedHashedPassword) {
       console.log("CORRECT");
       // Send a success response
       return res.json({ message: 'Login successful' });
@@ -136,10 +140,28 @@ app.post('/signup', (req, res) => {
    // Log the email and password sent in the request body
    const { email, hashedPassword } = req.body;
 
-   UID = Math.floor(Math.random() * (999999999999999 - 100000000000000 + 1)) + 100000000000000
-   console.log("UID:", UID)
+   createAccount(email, "Test Test", hashedPassword);
+});
 
-   createAccount(UID, email, "Test Test", hashedPassword);
+
+// Define a route to handle login requests
+app.post('/myteams', (req, res) => {
+  // Log the email and password sent in the request body
+  const { email, hashedPassword } = req.body;
+
+  retrieveTeams(email, (error, teams) => {
+    if (error) {
+      console.error('Error retrieving teams:', error.message);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    if (!teams) {
+      console.log('Teams not found');
+      return res.status(401).json({ message: 'Teams not found' });
+    }
+
+    res.send(teams)
+
+  });
 });
 
 

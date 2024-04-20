@@ -1,16 +1,42 @@
 <script>
-    let email = 'bigboy@gmail.com';
-    let password = 'test';
+    let email = 'josh@gmail.com';
+    let password = '123';
     export let loginType = "login";
 
     const hashPassword = async () => {
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
         const buffer = await crypto.subtle.digest('SHA-256', data);
-        return new TextDecoder().decode(buffer); // Convert ArrayBuffer to Array
+        const hexString = Array.from(new Uint8Array(buffer))
+        .map(byte => ('0' + (byte & 0xFF).toString(16)).slice(-2))
+        .join(' ');
+        return `<Buffer ${hexString}>`;
+        // return new TextDecoder().decode(buffer); // Convert ArrayBuffer to Array
     };
 
+    const setCookie = (name, value, days) => {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    };
+
+    const getCookie = (name) => {
+        const cookieString = document.cookie;
+        const cookies = cookieString.split('; ').reduce((acc, cookie) => {
+            const [cookieName, cookieValue] = cookie.split('=');
+            acc[cookieName] = cookieValue;
+            return acc;
+        }, {});
+        return cookies[name];
+    };
+
+
     const login = async () => {
+        console.log("Logging in")
         try {
             const hashedPassword = await hashPassword();
             console.log(hashedPassword);
@@ -27,6 +53,10 @@
             console.log(data);
 
             if (data.message === 'Login successful') {
+                setCookie('loggedIn', true, 7);
+                setCookie('email', email, 7);
+                setCookie('password', hashedPassword, 7);
+
                 window.location.href = "/home";
             } else {
                 console.log('Login unsuccessful');
