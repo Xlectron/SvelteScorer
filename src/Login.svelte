@@ -7,42 +7,62 @@
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
         const buffer = await crypto.subtle.digest('SHA-256', data);
-        return new Uint8Array(buffer);
+        return new TextDecoder().decode(buffer); // Convert ArrayBuffer to Array
     };
 
     const login = async () => {
-    try {
-        const hashedPassword = await hashPassword(); // Assuming hashPassword is a function that returns the hashed password as a Buffer
-        console.log(hashedPassword);
+        try {
+            const hashedPassword = await hashPassword();
+            console.log(hashedPassword);
 
-        const response = await fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, hashedPassword: Array.from(hashedPassword) }) // Convert Buffer to array before sending
-        });
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, hashedPassword }) // Send hashedPassword as an array
+            });
 
-        const data = await response.json();
-        console.log(data); // Log the response from the server
+            const data = await response.json();
+            console.log(data);
 
-        if (data.message === 'Login successful') {
-            window.location.href = "/home"; // Redirect to home page
-        } else {
-            console.log('Login unsuccessful');
-            // Handle unsuccessful login here
+            if (data.message === 'Login successful') {
+                window.location.href = "/home";
+            } else {
+                console.log('Login unsuccessful');
+            }
+        } catch (error) {
+            console.error('Error:', error);
         }
-    } catch (error) {
-        console.error('Error:', error);
-    }
-};
-
-
+    };
 
     const signUp = async () => {
-        // Handle sign up logic
+        try {
+            const hashedPassword = await hashPassword();
+            console.log(hashedPassword);
+
+            const response = await fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, hashedPassword }) // Send hashedPassword as an array
+            });
+
+            const data = await response.json();
+            console.log(data);
+
+            if (data.message === 'Signup successful') {
+                window.location.href = "/home";
+            } else {
+                console.log('Signup unsuccessful');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
     };
 </script>
+
 
 
 <main>

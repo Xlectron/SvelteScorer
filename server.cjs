@@ -6,6 +6,7 @@ const path = require('path');
 const app = express();
 const port = 21511;
 
+
 // Create a single connection
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -28,11 +29,12 @@ connection.connect((err) => {
 function createAccount(id, email, name, password) {
   // Create a new hash object for each account
   const hash = crypto.createHash('sha256');
+  console.log("Creating Account with: ", id, email, name, password)
   
   // Using placeholders to avoid SQL injection
   const sql = `INSERT INTO users (id, email, hashedPassword, name) VALUES (?, ?, ?, ?)`;
-
-  const hashedPassword = hash.update(password, 'utf-8').digest('hex');
+  // utf-8 to hex, and update users
+  const hashedPassword = hash.update(password, 'hex').digest('hex');
 
   const values = [id, email, hashedPassword.toString(), name]; // Convert hashedPassword to string
 
@@ -41,7 +43,7 @@ function createAccount(id, email, name, password) {
       console.error('Error creating account:', error.message);
       return;
     }
-    console.log('Account created successfully:', results);
+    console.log('Account created successfully');
   });
 }
 
@@ -88,7 +90,6 @@ app.get('/login', (req, res) => {
 
 
 
-
 // Define a route to handle login requests
 app.post('/login', (req, res) => {
   // Log the email and password sent in the request body
@@ -104,9 +105,14 @@ app.post('/login', (req, res) => {
       return res.status(401).json({ message: 'User not found' });
     }
 
+    const hash = crypto.createHash('sha256');
+
     // Compare the received hashed password with the stored hashed password
-    const storedHashedPassword = Buffer.from(user.hashedPassword, 'utf-8');
-    const receivedHashedPassword = Buffer.from(hashedPassword, 'hex');
+    const storedHashedPassword = Buffer.from(user.hashedPassword, 'hex'); // This is hashed twice
+
+    var receivedHashedPassword = Buffer.from(hashedPassword, 'hex'); // This needs to be hashed a second time
+    receivedHashedPassword = Buffer.from(hash.update(receivedHashedPassword, 'hex').digest('hex'), 'hex');
+
 
     console.log("Stored:", storedHashedPassword)
     console.log("Recieved:", receivedHashedPassword)
@@ -125,8 +131,16 @@ app.post('/login', (req, res) => {
 
 
 
+// Define a route to handle login requests
+app.post('/signup', (req, res) => {
+   // Log the email and password sent in the request body
+   const { email, hashedPassword } = req.body;
 
+   UID = Math.floor(Math.random() * (999999999999999 - 100000000000000 + 1)) + 100000000000000
+   console.log("UID:", UID)
 
+   createAccount(UID, email, "Test Test", hashedPassword);
+});
 
 
 
