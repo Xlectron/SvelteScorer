@@ -40,6 +40,41 @@ function createAccount(email, name, password) {
     }
     console.log('Account created successfully');
   });
+  }
+
+
+function createTeam(number, name, email) {
+  console.log("Creating Team with:", name, number, email)
+  avgscore = 0
+
+  // Using placeholders to avoid SQL injection
+  const sql = `INSERT INTO teams (number, name, email, avgscore) VALUES (?, ?, ?, ?)`;
+
+  const values = [number, name, email, avgscore];
+
+  connection.query(sql, values, (error, results, fields) => {
+    if (error) {
+      console.error('Error creating team:', error.message);
+      return;
+    }
+    console.log('team created successfully');
+  });
+}
+
+
+function deleteTeam(number) {
+  console.log("Deleting team", number)
+  // Using placeholders to avoid SQL injection
+  const sql = 'DELETE FROM teams WHERE number = ?';
+  const values = [number];
+
+  connection.query(sql, values, (error, results, fields) => {
+    if (error) {
+      console.error('Error deleting team:', error.message);
+      return;
+    }
+    console.log('Team deleted successfully');
+  });
 }
 
 
@@ -163,6 +198,30 @@ app.post('/myteams', (req, res) => {
 
   });
 });
+
+
+
+// Define a route to handle login requests
+app.post('/myteams/addteamsrequest', (req, res) => {
+  // Log the email and password sent in the request body
+  const { name, number, email } = req.body;
+
+  createTeam(number, name, email);
+  res.json({ message: 'Add successful' })
+});
+
+
+// Define a route to handle login requests
+app.post('/myteams/deleteteamsrequest', (req, res) => {
+  console.log("askdjalskjdas")
+  // Log the email and password sent in the request body
+  const { number } = req.body;
+
+  deleteTeam(number);
+  res.json({ message: 'Delete successful' });
+});
+
+
 
 
 

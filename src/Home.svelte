@@ -9,17 +9,6 @@
 
     let email;
     let password;
-
-    const getCookie = (name) => {
-        const cookieString = document.cookie;
-        const cookies = cookieString.split('; ').reduce((acc, cookie) => {
-            const [cookieName, cookieValue] = cookie.split('=');
-            acc[cookieName] = cookieValue;
-            return acc;
-        }, {});
-        return cookies[name];
-    };
-
   
     // Function to handle navigation to different pages
     function navigateTo(location) {
@@ -30,8 +19,6 @@
             window.location.href = "/csscorer";
         case "NS":
             return
-        case "L":
-            window.location.href = "/leaderboard"
         case "MT":
             window.location.href = "/myteams";
             
@@ -118,7 +105,7 @@
       </button>
     </div>
     <div class="button-row">
-      <button class="button" on:click={() => navigateTo("L")}>
+      <button class="button" on:click={() => window.location.href = "/leaderboard"}>
         <img src={trophyimg} alt="" width="150"> <br> Leaderboard
       </button>
       <button class="button" on:click={() => navigateTo("MT")}>

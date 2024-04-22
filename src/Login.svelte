@@ -59,7 +59,7 @@
 
                 window.location.href = "/home";
             } else {
-                console.log('Login unsuccessful');
+                console.log('Incorrect email or password');
             }
         } catch (error) {
             console.error('Error:', error);

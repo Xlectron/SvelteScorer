@@ -5,6 +5,7 @@
   let email;
   let password;
   let teams = [];
+  let number;
   let isLoading = true; // Initialize loading indicator
   const dispatcher = createEventDispatcher();
 
@@ -41,6 +42,30 @@
       }
   };
 
+  const deleteTeam = async (index) => {
+        number = teams[index].number;
+        try {
+            const response = await fetch('/myteams/deleteteamsrequest', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ number }) // Send hashedPassword as an array
+            });
+
+            const data = await response.json();
+            console.log(data);
+
+            if (data.message === 'Delete successful') {
+                window.location.href = "/myteams";
+            } else {
+                console.log('Delete unsuccessful');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
   onMount(() => {
       myTeams();
   });
@@ -56,9 +81,6 @@
       }
   };
 
-  const deleteTeam = (index) => {
-      
-  };
 
 </script>
 
@@ -73,6 +95,7 @@
           {#each teams as team, index}
               <div class="team">
                   <h2>{team.name}</h2>
+                  <p> {team.number} </p>
                   <p class="avg-score">Average Score: {team.avgscore}</p>
                   <button class="delete-btn" on:click={() => confirmDelete(index)}>🗑️</button>
               </div>
