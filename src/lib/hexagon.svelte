@@ -5,6 +5,9 @@
 	export let row: number
 	export let column: number
 
+	const values = Object.values(PixelType)
+	const map = new Map(values.map((k, i) => [k, values[i + 1]]));
+
 	function determineColor(state: PixelType) {
 		switch (pixels.map[row][column]) {
 			case PixelType.None:
@@ -21,9 +24,6 @@
 				return "#505050";
 		}
 	}
-
-	const values = Object.values(PixelType)
-	const map = new Map(values.map((k, i) => [k, values[i + 1]]));
 
 	function nameToPixelType(name: string) {
 		switch (name) {
@@ -86,4 +86,4 @@
 	}
 </style>
 
-<button on:click={update} style="background-color: {color}"></button>
+<button on:click={update} style="background-color: {color}; width: {window.innerWidth / 30}"></button>

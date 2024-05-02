@@ -6,27 +6,33 @@
 
 	const { getOption, setOption } = createOptionsStore();
 
-	let pixels: Pixels;
-	pixels = new Pixels();
+	let pixels_1: Pixels;
+	pixels_1 = new Pixels();
+ 	pixels_1.calculate();
+    
+    let pixels_2: Pixels;
+	pixels_2 = new Pixels();
+ 	pixels_2.calculate();
 
- 	pixels.calculate();
+	const s_1 = pixels_1.score;
+    const s_2 = pixels_2.score;
 
-	const s = pixels.score;
-	$: score = $s;
+	$: score_1 = $s_1;
+    $: score_2 = $s_2;
 	let previousPenaltyValue = 0;
 
 	let colorPicker: HTMLDivElement;
 	function setActive(event: MouseEvent) {
 		const target = event.target as HTMLButtonElement;
-		if (pixels.active != "none" && pixels.active == target.id) {
-			pixels.active = "none";
+		if (pixels_1.active != "none" && pixels_1.active == target.id) {
+			pixels_1.active = "none";
 			colorPicker.childNodes.forEach((child) => {
 				if (child instanceof HTMLButtonElement) {
 					child.classList.remove("color-picker-active");
 				}
 			});
 		} else {
-			pixels.active = target.id;
+			pixels_1.active = target.id;
 			colorPicker.childNodes.forEach((child) => {
 				if (child instanceof HTMLButtonElement) {
 					child.classList.remove("color-picker-active");
@@ -43,7 +49,7 @@
         // Convert the selected penalty value to a number
         const penaltyValue = parseInt(selectedPenalty);
         // Subtract the penalty value from the score
-        score += (previousPenaltyValue - penaltyValue) * 30;
+        score_1 += (previousPenaltyValue - penaltyValue) * 30;
 
 		previousPenaltyValue = penaltyValue;
     }
@@ -54,7 +60,7 @@
         // Convert the selected penalty value to a number
         const penaltyValue = parseInt(selectedPenalty);
         // Subtract the penalty value from the score
-        score += (previousPenaltyValue - penaltyValue) * 10;
+        score_1 += (previousPenaltyValue - penaltyValue) * 10;
 
 		previousPenaltyValue = penaltyValue;
     }
@@ -79,8 +85,8 @@
             />
         </div>
     </div>
+
     
-    <!-- Blue Team Input Boxes -->
     <div class="team-inputs blue">
         <div class="input-container">
             <input type="text" placeholder="Team 1" style="background-color: #E3F2FD; color: #2196F3; width: 100px;">
@@ -88,7 +94,6 @@
         </div>
     </div>
     
-    <!-- Red Team Input Boxes -->
     <div class="team-inputs red">
         <div class="input-container">
             <input type="text" placeholder="Team 1" style="background-color: #FFEBEE; color: red; width: 100px;">
@@ -97,15 +102,16 @@
     </div>
     
 
-    <!-- Major and Minor Penalties -->
     <div class="penalties">
         <div class="input-container">
+            <!-- svelte-ignore a11y-label-has-associated-control -->
             <label style="color: #000000;">Major Penalties:</label>
             <select style="width: 100px;" on:change={majorPenalty}>
                 {#each Array(100) as num, index}
                     <option value={index}>{index}</option>
                 {/each}
             </select>
+            <!-- svelte-ignore a11y-label-has-associated-control -->
             <label style="color: #000000;">Minor Penalties:</label>
             <select style="width: 100px;" on:change={minorPenalty}>
                 {#each Array(100) as num, index}
@@ -115,27 +121,47 @@
         </div>
     </div>
 
-    
-    <!-- Save Match Button -->
+
     <div class="save-match">
         <button class="button" style="background-color: #4CAF50; color: white;">Save Match</button>
     </div>
-    
-    <!-- Hexagons and Score -->
-    <div style="style: flex">
-        {#each Array(11) as _, row}
-            <div class="line">
-                {#each Array(6 + (row % 2)) as _, column}
-                    <Hexagon {pixels} row={10 - row} {column}></Hexagon>
-                {/each}
 
-                {#if $getOption("setlines") && (row - 1) % 3 == 0 && row != 10}
-                    <div class="setline" style="top: {row}"></div>
-                {/if}
-            </div>
-        {/each}
-        <h2 style="color: rgb(255, 100, 0); margin-top: .5em; margin-bottom: .5em">{score != 0 ? score : 0}</h2>
+
+    <div class="container">
+        <!-- Hexagons and Score -->
+        <div style="style: flex">
+            {#each Array(11) as _, row} <!-- Loop 11 times -->
+                <div class="line"> <!-- Create a div container for each line -->
+                    {#each Array(6 + (row % 2)) as _, column} <!-- Loop 6 or 7 times, depending on row-->
+                        <Hexagon pixels={pixels_1} row={10 - row} {column}></Hexagon> <!-- Create pixel objects-->
+                    {/each}
+
+                    {#if $getOption("setlines") && (row - 1) % 3 == 0 && row != 10} <!-- Create a set line every 3 rows-->
+                        <div class="setline" style="top: {row}"></div>
+                    {/if}
+                </div>
+            {/each}
+            <h2 style="color: rgb(255, 100, 0); margin-top: .5em; margin-bottom: .5em">{score_1 != 0 ? score_1 : 0}</h2>
+        </div>
+            <!-- Hexagons and Score -->
+        <div style="style: flex">
+            {#each Array(11) as _, row}
+                <div class="line">
+                    {#each Array(6 + (row % 2)) as _, column}
+                        <Hexagon pixels={pixels_2} row={10 - row} {column}></Hexagon>
+                    {/each}
+
+                    {#if $getOption("setlines") && (row - 1) % 3 == 0 && row != 10}
+                        <div class="setline" style="top: {row}"></div>
+                    {/if}
+                </div>
+            {/each}
+            <h2 style="color: rgb(255, 100, 0); margin-top: .5em; margin-bottom: .5em">{score_2 != 0 ? score_2 : 0}</h2>
+        </div>
     </div>
+
+    
+
 
     <!-- Back Button -->
     <div class="bottom-buttons">
@@ -144,6 +170,19 @@
 </main>
 
 <style>
+    .container {
+        display: flex;
+        width: 100%;
+    }
+
+    .container:first-child {
+        margin-right: 10px; /* Adjust margin as needed */
+    }
+
+    .container:last-child {
+        margin-left: 10px; /* Adjust margin as needed */
+    }
+
     .team-inputs {
         position: absolute;
         left: 20px;
@@ -154,7 +193,7 @@
     }
 
     .team-inputs.red {
-        top: 250px; /* Adjust top position as needed */
+        top: 225px; /* Adjust top position as needed */
     }
 
     .input-container {
@@ -162,12 +201,6 @@
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .team-inputs label {
-        font-weight: bold;
-        margin-bottom: 10px;
-        display: block;
     }
 
     .team-inputs input {

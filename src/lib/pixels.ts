@@ -153,8 +153,8 @@ export class Pixels {
 	}
 
 	calculate() {
-		const groups: Array<Array<Pixel>> = [];
-		const visited = new Set<string>();
+		const groups: Array<Array<Pixel>> = []; // Creates storage for pixel groups
+		const visited = new Set<string>(); // 
 
 		function hasVisited(pixel: Pixel): boolean {
 			return visited.has(pixel.toString());

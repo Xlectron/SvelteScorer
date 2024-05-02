@@ -18,6 +18,10 @@
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap');
 
+	.option:hover {
+		background-color: rgb(47, 47, 47);
+	}
+
 	.option {
 		background-color: rgb(57, 57, 57);
 		outline: none;
@@ -29,8 +33,5 @@
 		transition: .2s;
 		font-family: 'Josefin Sans', sans-serif;
 
-	}
-	.option:hover {
-		background-color: rgb(47, 47, 47);
 	}
 </style>

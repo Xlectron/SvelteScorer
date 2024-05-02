@@ -4,6 +4,17 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const port = 21511;
+const { execSync } = require('child_process');
+    
+try {
+  console.log("Compiling Svelte files...");
+  execSync("npm run build", { stdio: 'inherit' }); // Outputs the normal build process
+  console.log("Svelte files compiled successfully.");
+} catch (error) {
+  console.error("Error compiling Svelte files:", error.message);
+  process.exit(1); // Exit the process with an error code
+}
+
 
 
 // Create a single connection
@@ -99,10 +110,14 @@ function retrieveUser(email, callback) {
 
 
 function retrieveTeams(email, callback) {
+  // Selects teams which contain the user's email
   const sql = 'SELECT * FROM teams WHERE email = ?';
+
+  // Queries database
   connection.query(sql, [email], (error, results, fields) => {
     if (error) {
-      console.error('Error retrieving teams:', error.message);
+      // Error Flagging
+      console.error('Error retrieving teams:', error.message); 
       callback(error, null);
       return;
     }
@@ -112,7 +127,7 @@ function retrieveTeams(email, callback) {
       return;
     }
     const teams = results; // Array of different teams
-    callback(null, teams);
+    callback(null, teams); // Returns everything
   });
 }
 
@@ -130,7 +145,7 @@ app.use(express.json());
 // Serve static files from the "dist" directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Define a route to serve your HTML file for the root path
+// Define a route to serve HTML file for the root path
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
