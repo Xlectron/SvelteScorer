@@ -16,6 +16,10 @@ For actually running the application, you can run:
 
 in the root directory. This runs the JavaScript code in node runtime environment, which is the backend (and serves the HTML stuff). However, built into the server.cjs command is
 
-```npm run build``
+```npm run build```
 
 which compiles all the svelte files into native script. As I said, it should be in-built, but just FYI. 
+
+After that, you can navigate to http://localhost:21511
+
+You can just follow the terminal prompts though.
