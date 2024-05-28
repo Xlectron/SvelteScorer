@@ -1,6 +1,6 @@
 <script>
     let email = 'josh@gmail.com';
-    let password = '123';
+    let password = 'test123';
     export let loginType = "login";
 
     const hashPassword = async () => {

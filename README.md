@@ -10,7 +10,9 @@ Once this is installed, running ```npm -i``` will install all dependencies withi
 
 Anyway, I'll check everything out before final submission. It is probably a lot of pain to setup now.
 
-For actually running the application, you can run:
+To run the database server, you need to open XAMPP. This can be found in the XAMPP director -> "xampp-control.exe". Once XAMPP is open, run "MySQL"
+
+For actually starting the server, run:
 
 ```node server.cjs```
 
