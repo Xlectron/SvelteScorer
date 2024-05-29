@@ -9,7 +9,7 @@
 
     let email;
     let password;
-  
+
     // Function to handle navigation to different pages
     function navigateTo(location) {
       switch(location) {

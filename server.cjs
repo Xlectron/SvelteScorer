@@ -16,7 +16,6 @@ try {
 }
 
 
-
 // Create a single connection
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -36,6 +35,7 @@ connection.connect((err) => {
 });
 
 
+
 function createAccount(email, name, password) {
   console.log("Creating Account with: ", email, name, password)
 
@@ -52,6 +52,39 @@ function createAccount(email, name, password) {
     console.log('Account created successfully');
   });
   }
+
+
+
+  function saveMatch(teamsObj, scoresObj, email) {
+    console.log("Saving match, using email: ", email)
+  
+    // Using placeholders to avoid SQL injection
+    const sql = `INSERT INTO matches (teams, scores, date, email) VALUES (?, ?, ?, ?)`;
+
+      // Extract team names from the teamsObj object
+    const teams = Object.values(teamsObj);
+    // Extract scores from the scoresObj object
+    const scores = Object.values(scoresObj);
+    const date = new Date();
+    console.log("Saving match, using email: ", email);
+
+    // Joining array elements into strings
+    const teamsString = teams.join(' '); // Join teams array elements into a space-separated string
+    const scoresString = scores.join(' '); // Join scores array elements into a space-separated string
+
+    console.log(teamsString);
+    console.log(scoresString);
+  
+    const values = [teamsString, scoresString, date, email];
+  
+    connection.query(sql, values, (error, results, fields) => {
+      if (error) {
+        console.error('Error saving team:', error.message);
+        return;
+      }
+      console.log('Match saved successfully');
+    });
+    }
 
 
 function createTeam(number, name, email) {
@@ -89,6 +122,22 @@ function deleteTeam(number) {
 }
 
 
+function deleteMatch(team) {
+  console.log("Deleting match", team)
+  // Using placeholders to avoid SQL injection
+  const sql = 'DELETE FROM matches WHERE teams = ?';
+  const values = [team];
+
+  connection.query(sql, values, (error, results, fields) => {
+    if (error) {
+      console.error('Error deleting matches:', error.message);
+      return;
+    }
+    console.log('Match deleted successfully');
+  });
+}
+
+
 function retrieveUser(email, callback) {
   const sql = 'SELECT * FROM users WHERE email = ?';
   connection.query(sql, [email], (error, results, fields) => {
@@ -104,6 +153,27 @@ function retrieveUser(email, callback) {
     }
     // Assuming there's only one user for a given email
     const user = results[0];
+    callback(null, user);
+  });
+}
+
+
+function getMatches(email, callback) {
+  const sql = 'select * from matches;';
+  
+  connection.query(sql, [email], (error, results, fields) => {
+    if (error) {
+      console.error('Error retrieving matches:', error.message);
+      callback(error, null);
+      return;
+    }
+    if (results.length === 0) {
+      console.log('Matches not found');
+      callback(null, null);
+      return;
+    }
+    // Assuming there's only one user for a given email
+    const user = results;
     callback(null, user);
   });
 }
@@ -149,6 +219,17 @@ app.use(express.static(path.join(__dirname, 'dist')));
 app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
+
+
+
+// Define a route to handle login requests
+app.post('/savematch', (req, res) => {
+  // Log the email and password sent in the request body
+  const { teams, scores, email } = req.body;
+
+  saveMatch(teams, scores, email);
+});
+
 
 
 
@@ -227,8 +308,26 @@ app.post('/myteams/addteamsrequest', (req, res) => {
 
 
 // Define a route to handle login requests
+app.post('/myteams/getmatchesfromdatabase', (req, res) => {
+  // Log the email and password sent in the request body
+  const { email } = req.body;
+
+  getMatches(email, (error, matches) => {
+    if (error) {
+      console.error('Error retrieving matches:', error.message);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+    if (!matches) {
+      console.log('Matches not found');
+      return res.status(401).json({ message: 'matches not found' });
+    }
+    res.send(matches)
+  });
+});
+
+
+// Define a route to handle login requests
 app.post('/myteams/deleteteamsrequest', (req, res) => {
-  console.log("askdjalskjdas")
   // Log the email and password sent in the request body
   const { number } = req.body;
 
@@ -238,6 +337,14 @@ app.post('/myteams/deleteteamsrequest', (req, res) => {
 
 
 
+// Define a route to handle login requests
+app.post('/myteams/deletematchesrequest', (req, res) => {
+  // Log the email and password sent in the request body
+  const { teams } = req.body;
+
+  deleteMatch(teams);
+  res.json({ message: 'Delete successful' });
+});
 
 
 

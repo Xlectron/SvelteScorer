@@ -5,6 +5,8 @@
 	import { Pixels, PixelType } from "./lib/pixels";
 
 	const { getOption, setOption } = createOptionsStore();
+    let email;
+    let password;
 
 	let pixels_1: Pixels;
 	pixels_1 = new Pixels();
@@ -16,10 +18,61 @@
 
 	const s_1 = pixels_1.score;
     const s_2 = pixels_2.score;
+    let teams = {}
+    let scores = {}
 
 	$: score_1 = $s_1;
     $: score_2 = $s_2;
-	let previousPenaltyValue = 0;
+	let previousPenaltyValue_blue_minor = 0;
+    let previousPenaltyValue_blue_major = 0;
+    let previousPenaltyValue_red_minor = 0;
+    let previousPenaltyValue_red_major = 0;
+
+    const getCookie = (name) => {
+      const cookieString = document.cookie;
+      const cookies = cookieString.split('; ').reduce((acc, cookie) => {
+          const [cookieName, cookieValue] = cookie.split('=');
+          acc[cookieName] = cookieValue;
+          return acc;
+      }, {});
+      return cookies[name];
+    };
+
+    const saveMatch = async () => {
+      email = getCookie('email')
+      password = getCookie('password')
+      console.log("Email:", email, "Password:", password)
+
+      const team1Name = (document.querySelector('.team-inputs.blue input:nth-child(1)') as HTMLInputElement).value;
+      const team2Name = (document.querySelector('.team-inputs.red input:nth-child(1)') as HTMLInputElement).value;
+      const team3Name = (document.querySelector('.team-inputs.blue input:nth-child(2)') as HTMLInputElement).value;
+      const team4Name = (document.querySelector('.team-inputs.red input:nth-child(2)') as HTMLInputElement).value;
+
+      teams = {team1Name, team2Name, team3Name, team4Name}
+      scores = {score_1, score_2}
+        
+      // You can save the scores and team names to a backend server here
+      // For simplicity, I'm just printing them out
+      console.log("Teams:", teams);
+      console.log("Scores:", scores);
+      
+      try {
+          const response = await fetch('/savematch', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ teams, scores, email }) 
+          });
+
+          const data = await response.json();
+          console.log(data)
+
+      } catch (error) {
+          console.error('Error:', error);
+      }
+  };
+
 
 	let colorPicker: HTMLDivElement;
 	function setActive(event: MouseEvent) {
@@ -43,26 +96,50 @@
 	}
 
 
-	function majorPenalty(event: Event) {
+	function majorPenaltyBlue(event: Event) {
         // Get the selected penalty value
         const selectedPenalty = (event.target as HTMLSelectElement).value;
         // Convert the selected penalty value to a number
         const penaltyValue = parseInt(selectedPenalty);
         // Subtract the penalty value from the score
-        score_1 += (previousPenaltyValue - penaltyValue) * 30;
+        
+        score_1 += (previousPenaltyValue_blue_major - penaltyValue) * 30;
 
-		previousPenaltyValue = penaltyValue;
+		previousPenaltyValue_blue_major = penaltyValue;
     }
 
-	function minorPenalty(event: Event) {
+	function minorPenaltyBlue(event: Event) {
         // Get the selected penalty value
         const selectedPenalty = (event.target as HTMLSelectElement).value;
         // Convert the selected penalty value to a number
         const penaltyValue = parseInt(selectedPenalty);
         // Subtract the penalty value from the score
-        score_1 += (previousPenaltyValue - penaltyValue) * 10;
+        score_1 += (previousPenaltyValue_blue_minor - penaltyValue) * 10;
 
-		previousPenaltyValue = penaltyValue;
+		previousPenaltyValue_blue_minor = penaltyValue;
+    }
+
+    function majorPenaltyRed(event: Event) {
+        // Get the selected penalty value
+        const selectedPenalty = (event.target as HTMLSelectElement).value;
+        // Convert the selected penalty value to a number
+        const penaltyValue = parseInt(selectedPenalty);
+        // Subtract the penalty value from the score
+        
+        score_2 += (previousPenaltyValue_red_major - penaltyValue) * 30;
+
+		previousPenaltyValue_red_major = penaltyValue;
+    }
+
+	function minorPenaltyRed(event: Event) {
+        // Get the selected penalty value
+        const selectedPenalty = (event.target as HTMLSelectElement).value;
+        // Convert the selected penalty value to a number
+        const penaltyValue = parseInt(selectedPenalty);
+        // Subtract the penalty value from the score
+        score_2 += (previousPenaltyValue_red_minor - penaltyValue) * 10;
+
+		previousPenaltyValue_red_minor = penaltyValue;
     }
 
 </script>
@@ -89,31 +166,30 @@
     
     <div class="team-inputs blue">
         <div class="input-container">
-            <input type="text" placeholder="Team 1" style="background-color: #E3F2FD; color: #2196F3; width: 100px;">
-            <input type="text" placeholder="Team 2" style="background-color: #E3F2FD; color: #2196F3; width: 100px;">
+            <input type="text" placeholder="Team 1" style="background-color: #E3F2FD; color: #2196F3; width: 100px;" value="13710">
+            <input type="text" placeholder="Team 2" style="background-color: #E3F2FD; color: #2196F3; width: 100px;" value="21511">
         </div>
     </div>
     
     <div class="team-inputs red">
         <div class="input-container">
-            <input type="text" placeholder="Team 1" style="background-color: #FFEBEE; color: red; width: 100px;">
-            <input type="text" placeholder="Team 2" style="background-color: #FFEBEE; color: red; width: 100px;">
+            <input type="text" placeholder="Team 1" style="background-color: #FFEBEE; color: red; width: 100px;" value="12993">
+            <input type="text" placeholder="Team 2" style="background-color: #FFEBEE; color: red; width: 100px;" value="19283">
         </div>
     </div>
     
-
-    <div class="penalties">
+    <div class="penalties_blue" style="top: 200px;">
         <div class="input-container">
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <label style="color: #000000;">Major Penalties:</label>
-            <select style="width: 100px;" on:change={majorPenalty}>
+            <select style="width: 100px;" on:change={majorPenaltyBlue}>
                 {#each Array(100) as num, index}
                     <option value={index}>{index}</option>
                 {/each}
             </select>
             <!-- svelte-ignore a11y-label-has-associated-control -->
             <label style="color: #000000;">Minor Penalties:</label>
-            <select style="width: 100px;" on:change={minorPenalty}>
+            <select style="width: 100px;" on:change={minorPenaltyBlue}>
                 {#each Array(100) as num, index}
                     <option value={index}>{index}</option>
                 {/each}
@@ -121,9 +197,28 @@
         </div>
     </div>
 
+    <div class="penalties_red" style="top: 200px;">
+        <div class="input-container">
+            <!-- svelte-ignore a11y-label-has-associated-control -->
+            <label style="color: #000000;">Major Penalties:</label>
+            <select style="width: 100px;" on:change={majorPenaltyRed}>
+                {#each Array(100) as num, index}
+                    <option value={index}>{index}</option>
+                {/each}
+            </select>
+            <!-- svelte-ignore a11y-label-has-associated-control -->
+            <label style="color: #000000;">Minor Penalties:</label>
+            <select style="width: 100px;" on:change={minorPenaltyRed}>
+                {#each Array(100) as num, index}
+                    <option value={index}>{index}</option>
+                {/each}
+            </select>
+        </div>
+    </div>
+    
 
     <div class="save-match">
-        <button class="button" style="background-color: #4CAF50; color: white;">Save Match</button>
+        <button class="button" style="background-color: #4CAF50; color: white;" on:click={saveMatch}>Save Match</button>
     </div>
 
 
@@ -160,9 +255,6 @@
         </div>
     </div>
 
-    
-
-
     <!-- Back Button -->
     <div class="bottom-buttons">
         <button class="button" on:click={() => window.location.href = "/home"}>Back</button>
@@ -185,15 +277,17 @@
 
     .team-inputs {
         position: absolute;
-        left: 20px;
+        
     }
 
     .team-inputs.blue {
         top: 100px; /* Adjust top position as needed */
+        left: 20px;
     }
 
     .team-inputs.red {
-        top: 225px; /* Adjust top position as needed */
+        top: 100px; /* Adjust top position as needed */
+        right: 20px;
     }
 
     .input-container {
@@ -212,19 +306,40 @@
         box-sizing: border-box;
     }
     
-    .penalties {
+    .penalties_red {
         position: absolute;
         right: 20px;
         top: 100px; /* Adjust top position as needed */
     }
 
-    .penalties label {
+    .penalties_blue {
+        position: absolute;
+        left: 20px;
+        top: 100px; /* Adjust top position as needed */
+    }
+
+    .penalties_blue label {
         font-weight: bold;
         margin-bottom: 5px;
         display: block;
     }
 
-    .penalties select {
+    .penalties_red label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .penalties_red select {
+        width: 100px;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+
+    .penalties_blue select {
         width: 100px;
         padding: 10px;
         border-radius: 4px;
@@ -329,6 +444,36 @@
         position: fixed;
         bottom: 20px;
         left: 20px;
+    }
+
+    /* Define a media query for screens smaller than 768px */
+    @media screen and (max-width: 768px) {
+        .team-inputs {
+            position: static; /* Remove absolute positioning */
+            margin-top: 20px; /* Add margin for spacing */
+        }
+
+        .penalties {
+            position: static; /* Remove absolute positioning */
+            margin-top: 20px; /* Add margin for spacing */
+        }
+
+        .save-match {
+            position: static; /* Remove absolute positioning */
+            margin-top: 20px; /* Add margin for spacing */
+        }
+
+        /* Adjust width and padding for input fields */
+        .team-inputs input {
+            width: calc(50% - 15px); /* Adjust width for smaller screens */
+            margin-right: 10px; /* Add margin for spacing */
+        }
+
+        /* Adjust width and margin for penalties */
+        .penalties select {
+            width: calc(50% - 15px); /* Adjust width for smaller screens */
+            margin-right: 10px; /* Add margin for spacing */
+        }
     }
 
 </style>

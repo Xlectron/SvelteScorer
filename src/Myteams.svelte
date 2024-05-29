@@ -81,9 +81,24 @@
       }
   };
 
+  const openDialog = (team) => {
+      // Here, you can define your dialog box logic
+      // For example, you can use a modal library like @sveltejs/modal
+      // Or create your own custom dialog component
+      
+      // For demonstration, I'll just log the selected team
+      console.log('Selected team:', team);
+  };
+
+
+  const viewMatches = () => {
+    console.log("Moving Page")
+    // Navigate to the page where you want to display the matches
+    window.location.href = "/myteams/viewmatches";
+  };
+  
 
 </script>
-
 
 <main>
   <h1>FTC Scorer</h1>
@@ -106,6 +121,8 @@
   <div class="bottom-buttons">
       <button class="button" on:click={() => window.location.href = "/home"}>Back</button>
       <button class="button add-team-btn" on:click={addTeam}>Add Team</button>
+      <button class="button view-matches-btn" on:click={viewMatches}>View Matches</button>
+
   </div>    
 </main>
 

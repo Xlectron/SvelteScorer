@@ -5,6 +5,7 @@
 	import Leaderboard from './Leaderboard.svelte';
 	import Myteams from './Myteams.svelte'
 	import Addteams from './Addteams.svelte'
+	import ViewMatches from './Viewmatches.svelte'
 	
 	import { Router, Link, Route } from "svelte-routing";
     
@@ -25,6 +26,7 @@
 			<Route path="/leaderboard" component={Leaderboard} />
 			<Route path="/myteams" component={Myteams} />
 			<Route path="/myteams/addteam" component={Addteams} />
+			<Route path="/myteams/viewmatches" component={ViewMatches} />
 		</div>
 	</Router>
 </main>
